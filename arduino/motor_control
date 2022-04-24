@@ -1,14 +1,24 @@
 #include<ros.h>
 #include <docking/xyInput.h>
+#include <docking/limit.h>
+
 #define x_d 5   //cw+
 #define x_mm 4  //clk+ 
 #define y_d 3   //cw+
 #define y_mm 2  //clk+
+
 #define pulse 1000
+
+#define y_limit_left 6 // at front
+#define y_limit_right 7
+#define x_limit_up 8
+#define x_limit_down 9
 ros::NodeHandle nh;
 
 using docking::xyInput;
+using docking::limit;
 
+docking::limit limit_msg;
 
 int angle(float degree,char xy){ // 각도로 이동
   if(degree>0)
@@ -27,7 +37,7 @@ int angle(float degree,char xy){ // 각도로 이동
   return 1;  
 }
 
- int move_mm(int mm,char xy){ // mm 단위로 이동
+int move_mm(int mm,char xy){ // mm 단위로 이동
   if(xy=='y'){   
     if(mm>0)
       digitalWrite(y_d,HIGH);
@@ -38,10 +48,14 @@ int angle(float degree,char xy){ // 각도로 이동
     int dy = 100*mm;
     for(int i=0;i<dy;i++)
     {
-      digitalWrite(y_mm,HIGH);//HIGH신호 입력
-      delayMicroseconds(pulse);//1000 마이크로초 대기 600~
-      digitalWrite(y_mm,LOW);//LOW신호 입력
-      delayMicroseconds(pulse);
+      if(digitalRead(y_limit_left)== LOW && digitalRead(y_limit_right) == LOW)
+       { 
+         digitalWrite(y_mm,HIGH);//HIGH신호 입력
+         delayMicroseconds(pulse);//1000 마이크로초 대기 600~
+         digitalWrite(y_mm,LOW);//LOW신호 입력
+         delayMicroseconds(pulse);
+       }
+       else break; 
     }
     return 1;
   }
@@ -58,17 +72,21 @@ int angle(float degree,char xy){ // 각도로 이동
     int dx = 100*mm;
     for(int i=0;i<dx;i++)
     {
-      digitalWrite(x_mm,HIGH);//HIGH신호 입력
-      delayMicroseconds(pulse);//1000 마이크로초 대기 600~
-      digitalWrite(x_mm,LOW);//LOW신호 입력
-      delayMicroseconds(pulse);
+      if(digitalRead(x_limit_up )== LOW && digitalRead(x_limit_down) == LOW )
+        { 
+          digitalWrite(x_mm,HIGH);//HIGH신호 입력
+          delayMicroseconds(pulse);//1000 마이크로초 대기 600~
+          digitalWrite(x_mm,LOW);//LOW신호 입력
+          delayMicroseconds(pulse);
+        }
+       else break;
     }
     return 1;
  }
 }
 
 
-void callback(const xyInput::Request & req, xyInput::Response & res)
+void motor_callback(const xyInput::Request & req, xyInput::Response & res)
 {
       
      float x = req.x;
@@ -103,28 +121,67 @@ void callback(const xyInput::Request & req, xyInput::Response & res)
      {
        res.done = 0;
      }
-     
-    
-  }
+}
 
-ros::ServiceServer<xyInput::Request, xyInput::Response>server("xy_srv",&callback);
+void limit_switch()
+{
+  if(digitalRead(x_limit_up)== HIGH)
+  { 
+    limit_msg.X_limit_up = 1;
+  }
+  else limit_msg.X_limit_up = 0;
+
+   if(digitalRead(x_limit_down)== HIGH)
+  { 
+    limit_msg.X_limit_down = 1;
+  }
+  else limit_msg.X_limit_down = 0;
+
+   if(digitalRead(y_limit_right)== HIGH)
+  { 
+    limit_msg.Y_limit_right = 1;
+  }
+  else limit_msg.Y_limit_right = 0;
+
+   if(digitalRead(y_limit_left)== HIGH)
+  { 
+    limit_msg.Y_limit_left = 1;
+  }
+  else limit_msg.Y_limit_left = 0;
+
+  
+  
+}
+
+
+ros::Publisher chatter("limit_msg", &limit_msg);
+ros::ServiceServer<xyInput::Request, xyInput::Response>server("xy_srv",&motor_callback);
+
+
 
 void setup() {
   
   nh.initNode();
   nh.advertiseService(server);
 
-  pinMode(2,OUTPUT);  //for up and down
-  pinMode(3,OUTPUT);
+  pinMode(y_mm,OUTPUT);  //for up and down(y)
+  pinMode(y_d,OUTPUT);
   
-  pinMode(4,OUTPUT);  //for left and right
-  pinMode(5,OUTPUT);
+  pinMode(x_mm,OUTPUT);  //for left and right(x)
+  pinMode(x_d,OUTPUT);
+
+  pinMode(y_limit_left,INPUT);  //Y_LIMIT_LEFT
+  pinMode(y_limit_right,INPUT); //Y_LIMIT_RIGHT
+  pinMode(x_limit_up,INPUT);    //X_LIMIT_UP
+  pinMode(x_limit_down,INPUT);  //X_LIMIT_DOWN
   
 
 }
 
 void loop() {
   
+  limit_switch();
+  chatter.publish( &limit_msg );
   nh.spinOnce();
   delay(10);
 }
