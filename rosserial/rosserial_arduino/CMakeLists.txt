@@ -12,6 +12,7 @@ add_message_files(FILES
 add_service_files(FILES
   Test.srv
   xyInput.srv
+  
 )
 
 catkin_python_setup()

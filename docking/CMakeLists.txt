@@ -3,8 +3,8 @@ project(docking)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
-add_service_files(FILES xyInput.srv desired_position.srv)
-
+add_service_files(FILES xyInput.srv desired_position.srv Init.srv)
+add_message_files(FILES limit.msg)
 
 generate_messages( DEPENDENCIES std_msgs)
 
