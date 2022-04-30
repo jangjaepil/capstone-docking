@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(docking)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation robot_msgs )
 
-add_service_files(FILES xyInput.srv desired_position.srv Init.srv)
+add_service_files(FILES xyInput.srv desired_position.srv Init.srv ppp.srv)
 add_message_files(FILES limit.msg)
 
 generate_messages( DEPENDENCIES std_msgs)
@@ -24,5 +24,10 @@ add_executable(Init src/Init.cpp)
 add_dependencies(Init docking_generate_messages_cpp)
 target_link_libraries(Init ${catkin_LIBRARIES})
 
+add_executable(ppp src/ppp.cpp)
+add_dependencies(ppp docking_generate_messages_cpp)
+target_link_libraries(ppp ${catkin_LIBRARIES})
+
+add_dependencies(ppp ${catkin_EXPORTED_TARGETS})
 
 

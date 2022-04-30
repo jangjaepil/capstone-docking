@@ -1,0 +1,5 @@
+bool ppp_start
+
+---
+
+bool ppp_done
