@@ -16,7 +16,7 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
   res.done = 0;
   
   dynamixel_workbench_msgs::DynamixelCommand zInput;
-  zInput.request.value = (4096/360)*(360/100)*z; //resolutoin 4096  deg/mm = 360/100(wil be experienced)     
+  zInput.request.value = -(4096/360)*(360/100)*z; //resolutoin 4096  deg/mm = 360/100(wil be experienced)     
   zInput.request.id = 3;
   zInput.request.addr_name = "Goal_Position";
   zInput.response.comm_result = 0;

@@ -20,5 +20,9 @@ add_executable(motor_controller src/motor_controller.cpp)
 add_dependencies(motor_controller docking_generate_messages_cpp)
 target_link_libraries(motor_controller ${catkin_LIBRARIES})
 
+add_executable(Init src/Init.cpp)
+add_dependencies(Init docking_generate_messages_cpp)
+target_link_libraries(Init ${catkin_LIBRARIES})
+
 
 
