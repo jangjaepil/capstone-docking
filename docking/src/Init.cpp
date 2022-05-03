@@ -15,8 +15,8 @@ bool Init_callback(docking::Init::Request &req, docking::Init::Response &res)
   res.Init_done = 0;
   if(req.Init_start == 1){
     
-    desired_xyz.request.x = 10;
-    desired_xyz.request.y = -10;
+    desired_xyz.request.x = 400;
+    desired_xyz.request.y = -400;
     desired_xyz.request.z = 0;
     
     
@@ -26,11 +26,12 @@ bool Init_callback(docking::Init::Request &req, docking::Init::Response &res)
    {
    	if(desired_xyz.response.done ==1)
    	{
-   	  desired_xyz.request.x = -10;
-          desired_xyz.request.y = 10;
+   	  desired_xyz.request.x = -100;
+          desired_xyz.request.y = 20;
           desired_xyz.request.z = 0;
-   	 // ROS_INFO(": %d",(int)res.done );
+   	  //ROS_INFO("Init done: %d",(int)res.Init_done );
    	  client->call(desired_xyz); 
+   	  
    	  break;
    	}
    }
@@ -48,9 +49,8 @@ bool Init_callback(docking::Init::Request &req, docking::Init::Response &res)
    
    
   }
-  else res.Init_done = 0;
-  
-    return true;
+
+  return 1;
 }
 
 

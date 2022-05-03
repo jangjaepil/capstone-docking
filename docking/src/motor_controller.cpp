@@ -25,7 +25,7 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
   xyInput.request.x = x;
   xyInput.request.y = y;
   xyInput.response.done = 0;
-  ROS_INFO("done: %d", (int)xyInput.response.done);
+  //ROS_INFO("done: %d", (int)xyInput.response.done);
    
    client1->call(zInput);
    client2->call(xyInput);
