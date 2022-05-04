@@ -32,7 +32,7 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
   //ROS_INFO("DONE: %d",(int)xyInput.response.done);
    while(1)
    {
-   	if(xyInput.response.done ==1 && zInput.response.comm_result ==1)
+   	if(xyInput.response.done ==1 /*&& zInput.response.comm_result ==1*/)
    	{
    	  res.done = 1;
    	  ROS_INFO("done: %d",(int)res.done );
@@ -60,6 +60,9 @@ int main(int argc, char **argv)
 
   return 0;
 }
+
+
+
 
 
 

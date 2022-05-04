@@ -3,7 +3,7 @@ project(docking)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation robot_msgs )
 
-add_service_files(FILES xyInput.srv desired_position.srv Init.srv ppp.srv door.srv)
+add_service_files(FILES  desired_position.srv Init.srv ppp.srv door.srv xyInput.srv)
 add_message_files(FILES limit.msg)
 
 generate_messages( DEPENDENCIES std_msgs)
