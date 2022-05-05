@@ -17,6 +17,7 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
   {
      while(1) //for xy
      {
+        ROS_INFO("For xy");
         client ->call(mark_pose);
         desired_xyz.request.x = mark_pose.response.trn_x;
         desired_xyz.request.y = mark_pose.response.trn_y;
@@ -47,9 +48,13 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
         {
           if(desired_xyz.response.done ==1) break;
         }
+        
+        
+        
      }
      while(1) // for z
-     {
+     {   
+          ROS_INFO("For z");
          client ->call(mark_pose);
          desired_xyz.request.x = 0;
          desired_xyz.request.y = 0;
@@ -75,18 +80,6 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
   return true;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "PPP");
@@ -111,3 +104,5 @@ int main(int argc, char **argv)
 
   return 0;
   }
+
+

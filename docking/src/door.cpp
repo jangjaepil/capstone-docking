@@ -16,11 +16,11 @@ bool door_Callback(docking::door::Request &req, docking::door::Response &res)
   door_Input.response.comm_result = 0;
   door_Input.request.value = 0; 
   
-  if(req.door ==1)
+  if(req.door_start ==1)
   {
      door_Input.request.value = -15; //resolutoin 4096 open the door     
   }
-  else if(req.door ==0)
+  else if(req.door_start ==0)
   {
       door_Input.request.value = 15; // close the door
   }
