@@ -3,7 +3,7 @@ project(docking)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation robot_msgs )
 
-add_service_files(FILES  desired_position.srv Init.srv ppp.srv door.srv xyInput.srv)
+add_service_files(FILES  desired_position.srv Init.srv ppp.srv door.srv xyInput.srv docking.srv)
 add_message_files(FILES limit.msg)
 
 generate_messages( DEPENDENCIES std_msgs)
@@ -31,6 +31,10 @@ target_link_libraries(ppp ${catkin_LIBRARIES})
 add_executable(door src/door.cpp)
 add_dependencies(door docking_generate_messages_cpp)
 target_link_libraries(door ${catkin_LIBRARIES})
+
+add_executable(main src/main.cpp)
+add_dependencies(main docking_generate_messages_cpp)
+target_link_libraries(main ${catkin_LIBRARIES})
 
 add_dependencies(door ${catkin_EXPORTED_TARGETS}) ##FOR USING robot_msgs
 

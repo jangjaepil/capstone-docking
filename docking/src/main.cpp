@@ -3,10 +3,10 @@
 #include "docking/Init.h"
 #include "docking/door.h"
 #include "docking/docking.h"
-#include "docking/desired_xyz.h"
+#include "docking/desired_position.h"
 
 ros::ServiceClient * client_Door;
-ros::ServiceClient * client_Iniit;
+ros::ServiceClient * client_Init;
 /*ros::ServiceClient * client_;*/
 ros::ServiceClient * client_Ppp;
 ros::ServiceClient * client_Xyz;
@@ -18,23 +18,23 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    docking::Init Init;
    //
    docking::ppp  ppp;
-   docking::desired_xyz xyz;
-   xyz.x=0;
-   xyz.y=0;
-   xyz.z=0;
+   docking::desired_position xyz;
+   xyz.request.x=0;
+   xyz.request.y=0;
+   xyz.request.z=0;
    
    if(req.docking_start == 1)
    {
-     door.door_start = 1;
+     door.request.door_start = 1;
      client_Door ->call(door);
      
-     Init.Init_start ==1;
+     Init.request.Init_start ==1;
      client_Init ->call(Init);
      
      //
      
      
-     ppp.ppp_start == 1;
+     ppp.request.ppp_start == 1;
      client_Init ->call(ppp);
      
      
@@ -42,7 +42,7 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
      
      client_Xyz ->call(xyz);
      
-     door.door_start = 0;
+     door.request.door_start = 0;
      client_Door ->call(door);
      
      res.done = 1;
@@ -51,7 +51,7 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    
    
    res.done = 1;
-   return 1
+   return 1;
 }
 
 
@@ -68,15 +68,15 @@ int main(int argc, char **argv)
   client_Door = &client_door;
   
   ros::ServiceClient client_init = nh.serviceClient<docking::Init>("Init");
-  client_Init = &client_Init;
+  client_Init = &client_init;
   
   /*ros::ServiceClient client_tmp2 = nh.serviceClient<docking::ppp>("ppp");
   client2 = &client_tmp2; */
   
-  ros::ServiceClient client_ppp = nh.serviceClient<docking::docking>("ppp");
+  ros::ServiceClient client_ppp = nh.serviceClient<docking::ppp>("ppp");
   client_Ppp = &client_ppp;
    
-  ros::ServiceClient client_xyz = nh.serviceClient<docking::desired_xyz>("xyz");
+  ros::ServiceClient client_xyz = nh.serviceClient<docking::desired_position>("xyz");
   client_Xyz = &client_xyz;
  
   
