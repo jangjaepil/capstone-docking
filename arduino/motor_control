@@ -6,19 +6,23 @@
 #define x_mm 4  //clk+ 
 #define y_d 3   //cw+
 #define y_mm 2  //clk+
-
+bool y_sign =HIGH; //1-> plus , 0 -> minus
+bool x_sign =HIGH; //
 #define pulse 1000
 
-#define y_limit_left 6 // at front
-#define y_limit_right 7
-#define x_limit_up 8
-#define x_limit_down 9
+#define y_limit_plus 6 // black
+#define y_limit_minus 7 //brown
+#define x_limit_plus 8   //white
+#define x_limit_minus 9 // gray
 ros::NodeHandle nh;
 
 using docking::xyInput;
 using docking::limit;
 
 docking::limit limit_msg;
+
+
+     
 
 int angle(float degree,char xy){ // 각도로 이동
   if(degree>0)
@@ -37,25 +41,47 @@ int angle(float degree,char xy){ // 각도로 이동
   return 1;  
 }
 
-int move_mm(int mm,char xy){ // mm 단위로 이동
+bool move_mm(int mm,char xy){ // mm 단위로 이동
   if(xy=='y'){   
     if(mm>0)
-      digitalWrite(y_d,HIGH);
-    else{
+    {
       digitalWrite(y_d,LOW);
+      y_sign = HIGH;
+      }
+    else{
+      digitalWrite(y_d,HIGH);
+      y_sign = LOW;
       mm = -1 * mm; 
     }
     int dy = 100*mm;
     for(int i=0;i<dy;i++)
     {
-      if(digitalRead(y_limit_left)== LOW && digitalRead(y_limit_right) == LOW)
+      
+      if(digitalRead(y_limit_plus)== LOW && digitalRead(y_limit_minus) == LOW)
        { 
          digitalWrite(y_mm,HIGH);//HIGH신호 입력
          delayMicroseconds(pulse);//1000 마이크로초 대기 600~
          digitalWrite(y_mm,LOW);//LOW신호 입력
          delayMicroseconds(pulse);
        }
-       else break; 
+      else if(digitalRead(y_limit_plus)== HIGH && y_sign == HIGH) break;
+      else if(digitalRead(y_limit_minus)== HIGH && y_sign == LOW) break;
+      else if(digitalRead(y_limit_plus)== HIGH && y_sign == LOW)
+      {
+        digitalWrite(y_mm,HIGH);//HIGH신호 입력
+        delayMicroseconds(pulse);//1000 마이크로초 대기 600~
+        digitalWrite(y_mm,LOW);//LOW신호 입력
+        delayMicroseconds(pulse);
+      }
+      else if(digitalRead(y_limit_minus)==HIGH && y_sign == HIGH)
+      {
+        
+        digitalWrite(y_mm,HIGH);//HIGH신호 입력
+        delayMicroseconds(pulse);//1000 마이크로초 대기 600~
+        digitalWrite(y_mm,LOW);//LOW신호 입력
+        delayMicroseconds(pulse);
+      }
+       
     }
     return 1;
   }
@@ -63,26 +89,49 @@ int move_mm(int mm,char xy){ // mm 단위로 이동
   {
     
     if(mm>0)
-      digitalWrite(x_d,HIGH);
-    else
     {
       digitalWrite(x_d,LOW);
+      x_sign = HIGH;
+    }
+    else
+    {
+      digitalWrite(x_d,HIGH);
       mm = -1 * mm; 
+      x_sign = LOW;
     }
     int dx = 100*mm;
     for(int i=0;i<dx;i++)
-    {
-      if(digitalRead(x_limit_up )== LOW && digitalRead(x_limit_down) == LOW )
+    { 
+     
+      if(digitalRead(x_limit_minus )== LOW && digitalRead(x_limit_plus) == LOW )
         { 
           digitalWrite(x_mm,HIGH);//HIGH신호 입력
           delayMicroseconds(pulse);//1000 마이크로초 대기 600~
           digitalWrite(x_mm,LOW);//LOW신호 입력
           delayMicroseconds(pulse);
+          
         }
-       else break;
+      else if(digitalRead(x_limit_plus)== HIGH && x_sign == HIGH) break;
+      else if(digitalRead(x_limit_minus)== HIGH && x_sign == LOW) break;
+      else if(digitalRead(x_limit_plus)== HIGH && x_sign == LOW)
+      {
+        digitalWrite(x_mm,HIGH);//HIGH신호 입력
+        delayMicroseconds(pulse);//1000 마이크로초 대기 600~
+        digitalWrite(x_mm,LOW);//LOW신호 입력
+        delayMicroseconds(pulse);
+      }
+      else if(digitalRead(x_limit_minus)==HIGH && x_sign == HIGH)
+      {
+        
+        digitalWrite(x_mm,HIGH);//HIGH신호 입력
+        delayMicroseconds(pulse);//1000 마이크로초 대기 600~
+        digitalWrite(x_mm,LOW);//LOW신호 입력
+        delayMicroseconds(pulse);
+      }
     }
-    return 1;
+   return 1;
  }
+
 }
 
 
@@ -94,7 +143,6 @@ void motor_callback(const xyInput::Request & req, xyInput::Response & res)
      bool donex = 0;
      bool doney = 0;
      res.done = 0;
-     
      if(x)
      {
         donex = move_mm(x,'x');
@@ -111,58 +159,31 @@ void motor_callback(const xyInput::Request & req, xyInput::Response & res)
      {
         doney = 1;
      }
-   
-    if(donex== 1 && doney == 1)
+
+      if(donex== 1 && doney == 1)
      {
         res.done = 1;
         
      }
-     else
+      else
      {
        res.done = 0;
      }
-}
 
-void limit_switch()
-{
-  if(digitalRead(x_limit_up)== HIGH)
-  { 
-    limit_msg.X_limit_up = 1;
-  }
-  else limit_msg.X_limit_up = 0;
-
-   if(digitalRead(x_limit_down)== HIGH)
-  { 
-    limit_msg.X_limit_down = 1;
-  }
-  else limit_msg.X_limit_down = 0;
-
-   if(digitalRead(y_limit_right)== HIGH)
-  { 
-    limit_msg.Y_limit_right = 1;
-  }
-  else limit_msg.Y_limit_right = 0;
-
-   if(digitalRead(y_limit_left)== HIGH)
-  { 
-    limit_msg.Y_limit_left = 1;
-  }
-  else limit_msg.Y_limit_left = 0;
-
-  
-  
+     
 }
 
 
-ros::Publisher chatter("limit_msg", &limit_msg);
 ros::ServiceServer<xyInput::Request, xyInput::Response>server("xy_srv",&motor_callback);
+
+
 
 
 
 void setup() {
   
   nh.initNode();
-  nh.advertiseService(server);
+   nh.advertiseService(server);
 
   pinMode(y_mm,OUTPUT);  //for up and down(y)
   pinMode(y_d,OUTPUT);
@@ -170,18 +191,19 @@ void setup() {
   pinMode(x_mm,OUTPUT);  //for left and right(x)
   pinMode(x_d,OUTPUT);
 
-  pinMode(y_limit_left,INPUT);  //Y_LIMIT_LEFT
-  pinMode(y_limit_right,INPUT); //Y_LIMIT_RIGHT
-  pinMode(x_limit_up,INPUT);    //X_LIMIT_UP
-  pinMode(x_limit_down,INPUT);  //X_LIMIT_DOWN
+  pinMode(y_limit_plus,INPUT);  //Y_LIMIT_PLUS
+  pinMode(y_limit_minus,INPUT); //Y_LIMIT_MINUS
+  pinMode(x_limit_plus,INPUT);    //X_LIMIT_PLUS
+  pinMode(x_limit_minus,INPUT);  //X_LIMIT_MINUS
   
 
 }
 
+
 void loop() {
+
+
+     nh.spinOnce();
   
-  limit_switch();
-  chatter.publish( &limit_msg );
-  nh.spinOnce();
-  delay(10);
+
 }
