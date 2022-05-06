@@ -27,24 +27,26 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    {
      door.request.door_start = 1;
      client_Door ->call(door);
-     
-     Init.request.Init_start ==1;
+    
+     Init.request.Init_start =1;
      client_Init ->call(Init);
      
      //
      
      
-     ppp.request.ppp_start == 1;
-     client_Init ->call(ppp);
+    // ppp.request.ppp_start == 1;
+    // client_Init ->call(ppp);
      
      
      //wait a seconds
      
-     client_Xyz ->call(xyz);
+   //  client_Xyz ->call(xyz);
      
-     door.request.door_start = 0;
-     client_Door ->call(door);
-     
+     if(Init.response.Init_done ==1)
+     {
+      door.request.door_start = 0;
+      client_Door ->call(door);
+     }
      res.done = 1;
       
    }

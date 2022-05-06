@@ -3,5 +3,7 @@
   <node name="serial_node" pkg="rosserial_arduino" type="serial_node.py" output="screen"/>
   <node name="Init" pkg="docking" type="Init" output="screen"/>
    <node name="door" pkg="docking" type="door" output="screen"/>
+   <node name="main" pkg="docking" type="main" output="screen"/>
+   
   <include file="$(find dynamixel_workbench_controllers)/launch/dynamixel_controllers.launch" />
 </launch>
