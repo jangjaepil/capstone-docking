@@ -25,11 +25,17 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
      while(1) //for xy
      {
         ROS_INFO("For xy");
-        client ->call(mark_pose);
-        desired_xyz.request.x = mark_pose.response.trn_x;
-        desired_xyz.request.y = mark_pose.response.trn_y;
-        desired_xyz.request.z = 0;
-        
+        while(1)
+        {
+          ROS_INFO("Detecting marker");
+         if(client ->call(mark_pose))
+          {
+           desired_xyz.request.x = mark_pose.response.trn_x*0.001; //m -> mm
+           desired_xyz.request.y = mark_pose.response.trn_y*0.001;
+           desired_xyz.request.z = 0;
+           break;
+          }        
+        }
         
         if(abs(mark_pose.response.trn_x - marker_x_d)<tol_x && abs(mark_pose.response.trn_y - marker_y_d)<tol_y)
         {
