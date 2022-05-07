@@ -12,6 +12,7 @@ float marker_z_d;
 float tol_x;
 float tol_y;
 float tol_z;
+int limit = 100;
 
 bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
 {
@@ -22,38 +23,41 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
 
   if(req.ppp_start == 1)
   {
-     while(1) //for xy
+     while(ros::ok()) //for xy
      {
         ROS_INFO("For xy");
         while(1)
         {
           ROS_INFO("Detecting marker");
-         if(client ->call(mark_pose))
+         if(client ->call(mark_pose)&& mark_pose.response.is_pos_return)
           {
-           desired_xyz.request.x = mark_pose.response.trn_x*1000; //m -> mm
-           desired_xyz.request.y = mark_pose.response.trn_y*1000;
+           desired_xyz.request.x = mark_pose.response.trn_x*1000-marker_x_d; //m -> mm
+           desired_xyz.request.y = mark_pose.response.trn_y*1000-marker_y_d;
            desired_xyz.request.z = 0;
            break;
           }        
         }
         
-        if(abs(mark_pose.response.trn_x - marker_x_d)<=tol_x && abs(mark_pose.response.trn_y - marker_y_d)<=tol_y)
+        if(abs(desired_xyz.request.x)<=tol_x && abs(desired_xyz.request.y)<=tol_y)
         {
+            ROS_INFO("good");
             break;
         }        
-        if(abs(mark_pose.response.trn_x - marker_x_d)<=tol_x && abs(mark_pose.response.trn_y - marker_y_d)>tol_y)
+        if(abs(desired_xyz.request.x)<=tol_x && abs(desired_xyz.request.y)>tol_y)
         {
+          ROS_INFO("moving y");
           desired_xyz.request.x = 0;
           client2->call(desired_xyz);
         }
-        if(abs(mark_pose.response.trn_x - marker_x_d)>tol_x && abs(mark_pose.response.trn_y - marker_y_d)<=tol_y)
+        if(abs(desired_xyz.request.x)>tol_x && abs(desired_xyz.request.y)<=tol_y)
         {
+          ROS_INFO("moving x");
           desired_xyz.request.y = 0;
           client2->call(desired_xyz);
         }
-        if(abs(mark_pose.response.trn_x - marker_x_d)>tol_x && abs(mark_pose.response.trn_y - marker_y_d)>tol_y)
+        if(abs(desired_xyz.request.x)>tol_x && abs(desired_xyz.request.y)>tol_y)
         {
-          
+          ROS_INFO("moving x and y");
           client2->call(desired_xyz);
         }
         
@@ -71,21 +75,25 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
          client ->call(mark_pose);
          desired_xyz.request.x = 0;
          desired_xyz.request.y = 0;
-         desired_xyz.request.z = mark_pose.response.trn_z;
+         desired_xyz.request.z = mark_pose.response.trn_z*1000-marker_z_d;
          
-         if(abs(mark_pose.response.trn_z-marker_z_d)<tol_z)
+         if(abs(desired_xyz.request.z)<tol_z)
          {
+           ROS_INFO("good");
            break;
          }
-         else 
+         if(abs(desired_xyz.request.z)>tol_z && abs(mark_pose.response.trn_z-marker_z_d)<limit); 
          {
-            client2->call(desired_xyz);
+                  
+                  client2->call(desired_xyz);
+         }
+         if(abs(desired_xyz.request.z)>limit)
+         { 
+                  desired_xyz.request.z = limit;
+                  client2->call(desired_xyz);
          }
          
-          while(1)
-        {
-          if(desired_xyz.response.done ==1) break;
-        }
+      
      }
   res.ppp_done = 1;  
   }
@@ -135,7 +143,7 @@ int main(int argc, char **argv)
   
  
   ros::ServiceServer service = nh.advertiseService("PPP", PPP_callback);
-  ros::ServiceClient client_tmp = nh.serviceClient<robot_msgs::mrkrPos>("mark_Pose");
+  ros::ServiceClient client_tmp = nh.serviceClient<robot_msgs::mrkrPos>("marker_pose_srv");
   client = &client_tmp;
   
   ros::ServiceClient client_tmp2 = nh.serviceClient<docking::desired_position>("desired_xyz");
