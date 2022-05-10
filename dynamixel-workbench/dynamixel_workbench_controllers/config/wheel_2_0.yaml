@@ -13,7 +13,7 @@ door:
 
 
 docking:
-  ID: 3
+  ID: 2
   Return_Delay_Time: 0
   Operating_Mode: 4
   Profile_Acceleration: 0
