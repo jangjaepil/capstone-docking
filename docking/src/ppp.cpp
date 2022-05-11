@@ -85,6 +85,7 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
            ROS_INFO("good");
            break;
          }
+<<<<<<< HEAD
          if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z<limit)
          {
                   
@@ -93,6 +94,15 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
                  client2->call(desired_xyz);
          }
          if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z>limit )
+=======
+         if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z<limit); 
+         {
+                  current_length = current_length + desired_xyz.request.z
+                  desired_xyz.request.z = current_length;
+                  client2->call(desired_xyz);
+         }
+         if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z>limit)
+>>>>>>> 7158a584507d480ca841d628a2d6665ada1b6702
          { 
                   desired_xyz.request.z = limit;
                   current_length=limit;

@@ -13,7 +13,17 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
   float x = req.x; //relative position mm
   float y = req.y; //relative position mm
   float z = req.z; //absolute position mm
+ 
   res.done = 0;
+  docking::xyInput xyInput;
+  xyInput.request.y = 0;
+  xyInput.response.done = 0;
+ 
+ if(x==0 && y==0)
+  { 
+     xyInput.request.x = 0;
+     client2->call(xyInput);
+  }
   
   int x_limit = int(x)/limit;
   float x_remain = x-x_limit*limit;
@@ -26,16 +36,14 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
   ROS_INFO("y_remain: %f",y_remain );
   
   dynamixel_workbench_msgs::DynamixelCommand zInput;
-  zInput.request.value = -(4096/360)*(360/100)*z; //resolutoin 4096  deg/mm = 360/100(wil be experienced)     
-  zInput.request.id = 3;
+  zInput.request.value = (4096/360)*(360/7.5)*z; //resolutoin 4096  deg/mm = 360/5(wil be experienced)     
+  zInput.request.id = 2;
   zInput.request.addr_name = "Goal_Position";
-  zInput.response.comm_result = 0;
+  
   client1->call(zInput);
   
   
-  docking::xyInput xyInput;
-  xyInput.request.y = 0;
-  xyInput.response.done = 0;
+ 
 
  if(x_limit>0) limit_sign =1;
  else limit_sign  = -1;
@@ -73,16 +81,19 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
      client2->call(xyInput);
      ROS_INFO("y_remain " );
   }
+  bool xyend = xyInput.response.done;
   
-  
-   
-   	if(xyInput.response.done ==1 /*&& zInput.response.comm_result ==1*/)
+   while(ros::ok())
+    {   
+        ROS_INFO("xydone: %d",(int)xyend );
+        ROS_INFO("zdone: %d",(int)zInput.response.comm_result );
+   	if(xyend ==1 && zInput.response.comm_result ==1)
    	{
    	  res.done = 1;
    	  ROS_INFO("done: %d",(int)res.done );
-   	  
+          break;	  
    	}
-   
+    }
    return 1;
 }
 
