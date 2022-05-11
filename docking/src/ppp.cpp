@@ -34,6 +34,8 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
            desired_xyz.request.x = mark_pose.response.trn_x*1000-marker_x_d; //m -> mm
            desired_xyz.request.y = mark_pose.response.trn_y*1000-marker_y_d;
            desired_xyz.request.z = 0;
+           ROS_INFO("g");
+           
            break;
           }        
         }
@@ -69,6 +71,7 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
         
         
      }
+     float current_length = 0;
      while(1) // for z
      {   
           ROS_INFO("For z");
@@ -82,17 +85,19 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
            ROS_INFO("good");
            break;
          }
-         if(abs(desired_xyz.request.z)>tol_z && abs(mark_pose.response.trn_z-marker_z_d)<limit); 
+         if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z<limit)
          {
                   
-                  client2->call(desired_xyz);
+                 current_length = current_length + desired_xyz.request.z;
+                 desired_xyz.request.z = current_length;
+                 client2->call(desired_xyz);
          }
-         if(abs(desired_xyz.request.z)>limit)
+         if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z>limit )
          { 
                   desired_xyz.request.z = limit;
+                  current_length=limit;
                   client2->call(desired_xyz);
          }
-         
       
      }
   res.ppp_done = 1;  
