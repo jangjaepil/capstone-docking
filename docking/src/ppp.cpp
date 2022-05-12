@@ -12,7 +12,7 @@ float marker_z_d;
 float tol_x;
 float tol_y;
 float tol_z;
-int limit = 100;
+int limit = 80;
 
 bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
 {
@@ -69,10 +69,10 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
         }
         
         
-        
-     }
+     } 
      float current_length = 0;
      while(1) // for z
+     
      {   
           ROS_INFO("For z");
          client ->call(mark_pose);
@@ -101,6 +101,8 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
                   desired_xyz.request.z = limit;
                   current_length=limit;
                   client2->call(desired_xyz);
+                  break;
+
          }
       
      }
@@ -116,7 +118,7 @@ void Text_Input(void)
   int i = 0;
   std::size_t found;
   std::ifstream inFile;
-  inFile.open("/home/jjp/catkin_ws/src/docking/config/docking_params.txt");
+  inFile.open("/home/volta/catkin_ws/src/capstone-docking/docking/config/docking_params.txt");
   if(inFile.is_open())   ROS_INFO("file open!");
   else ROS_INFO("NO");
   
