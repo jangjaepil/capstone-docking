@@ -1,7 +1,7 @@
 marker_x_d = 0
-marker_y_d = 20
+marker_y_d = 25
 marker_z_d = -130
-tol_x = 10
-tol_y = 5
+tol_x = 1
+tol_y = 1
 tol_z = 10
   

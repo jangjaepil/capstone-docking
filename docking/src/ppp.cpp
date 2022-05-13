@@ -12,7 +12,7 @@ float marker_z_d;
 float tol_x;
 float tol_y;
 float tol_z;
-int limit = 80;
+int limit = 90;
 
 bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
 {
