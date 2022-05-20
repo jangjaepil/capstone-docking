@@ -19,13 +19,13 @@ bool Init_callback(docking::Init::Request &req, docking::Init::Response &res)
    
       desired_xyz.request.x = 400;                  //400
       desired_xyz.request.y = -400;                 //-400
-      desired_xyz.request.z = 0;
+      desired_xyz.request.z = 5;
       client->call(desired_xyz); 
       ROS_INFO("Initializing" );
       
       desired_xyz.request.x = -100;              //-100
       desired_xyz.request.y = 20;                // 20
-      desired_xyz.request.z = 0;
+      desired_xyz.request.z = 5;
       client->call(desired_xyz); 
    	 
        	  

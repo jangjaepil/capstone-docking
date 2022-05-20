@@ -3,7 +3,11 @@
   
     
   <node name="motor_controller" pkg="docking" type="motor_controller" output="screen"/>
-  <node name="serial_node" pkg="rosserial_arduino" type="serial_node.py" output="screen"/>
+
+  <node name="serial_node" pkg="rosserial_arduino" type="serial_node.py" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="57600"/>
+  </node>
   <node name="Init" pkg="docking" type="Init" output="screen"/>
   <node name="door" pkg="docking" type="door" output="screen"/>
   <node name="main" pkg="docking" type="main" output="screen"/>

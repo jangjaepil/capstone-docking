@@ -18,7 +18,7 @@ bool door_Callback(docking::door::Request &req, docking::door::Response &res)
   
   if(req.door_start ==1)
   {
-     door_Input.request.value = -15; //resolutoin 4096 open the door     
+     door_Input.request.value = -15; //resolutoin 4096 open the door
   }
   else if(req.door_start ==0)
   {
@@ -34,8 +34,8 @@ bool door_Callback(docking::door::Request &req, docking::door::Response &res)
    	if(done-begin > 5.0)
    	{
    	  door_Input.request.id = 12;
-          door_Input.request.addr_name = "Goal_Velocity";
-          door_Input.request.value = 0; 
+      door_Input.request.addr_name = "Goal_Velocity";
+      door_Input.request.value = 0; 
    	  client1->call(door_Input);
    	  res.door_done = 1;
    	  

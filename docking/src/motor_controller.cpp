@@ -85,14 +85,14 @@ bool desired_positionCallback(docking::desired_position::Request &req, docking::
   
    while(ros::ok())
     {   
-        ROS_INFO("xydone: %d",(int)xyend );
-        ROS_INFO("zdone: %d",(int)zInput.response.comm_result );
-   	if(xyend ==1 && zInput.response.comm_result ==1)
-   	{
-   	  res.done = 1;
-   	  ROS_INFO("done: %d",(int)res.done );
-          break;	  
-   	}
+      ROS_INFO("xydone: %d",(int)xyend );
+      ROS_INFO("zdone: %d",(int)zInput.response.comm_result );
+     	if(xyend ==1 && zInput.response.comm_result ==1)
+     	{
+     	  res.done = 1;
+     	  ROS_INFO("done: %d",(int)res.done );
+            break;	  
+     	}
     }
    return 1;
 }

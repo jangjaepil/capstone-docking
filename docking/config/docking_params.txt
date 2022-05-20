@@ -1,6 +1,6 @@
 marker_x_d = 0
-marker_y_d = 25
-marker_z_d = -130
+marker_y_d = 23
+marker_z_d = -150
 tol_x = 1
 tol_y = 1
 tol_z = 10

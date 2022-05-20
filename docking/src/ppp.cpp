@@ -12,7 +12,7 @@ float marker_z_d;
 float tol_x;
 float tol_y;
 float tol_z;
-int limit = 90;
+int limit = 95;
 
 bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
 {
@@ -33,7 +33,7 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
           {
            desired_xyz.request.x = mark_pose.response.trn_x*1000+marker_x_d; //m -> mm
            desired_xyz.request.y = mark_pose.response.trn_y*1000+marker_y_d;
-           desired_xyz.request.z = 0;
+           desired_xyz.request.z = 5;
            ROS_INFO("g");
            
            break;
@@ -63,17 +63,17 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
           client2->call(desired_xyz);
         }
         
-        while(1)
+        while(ros::ok())
         {
           if(desired_xyz.response.done ==1) break;
         }
         
         
      } 
-     float current_length = 0;
-     while(1) // for z
+     //float current_length = 0;
+     // for z
      
-     {   
+        
           ROS_INFO("For z");
          client ->call(mark_pose);
          desired_xyz.request.x = 0;
@@ -83,29 +83,29 @@ bool PPP_callback(docking::ppp::Request &req, docking::ppp::Response &res)
          if(abs(desired_xyz.request.z)<tol_z)
          {
            ROS_INFO("good");
-           break;
+          
          }
 
-         if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z<limit)
+         if(abs(desired_xyz.request.z)>tol_z && desired_xyz.request.z<limit)
          {
                   
-                 current_length = current_length + desired_xyz.request.z;
-                 desired_xyz.request.z = current_length;
+                // current_length = current_length + desired_xyz.request.z;
+                // desired_xyz.request.z = current_length;
                  client2->call(desired_xyz);
          }
          
          
-         if(abs(desired_xyz.request.z)>tol_z && current_length+desired_xyz.request.z>limit)
+         if(abs(desired_xyz.request.z)>tol_z && desired_xyz.request.z>limit)
 
          { 
                   desired_xyz.request.z = limit;
-                  current_length=limit;
+                 // current_length=limit;
                   client2->call(desired_xyz);
-                  break;
+                  
 
          }
       
-     }
+     
   res.ppp_done = 1;  
   }
   else res.ppp_done = 1;
