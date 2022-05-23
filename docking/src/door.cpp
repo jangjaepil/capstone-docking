@@ -28,14 +28,14 @@ bool door_Callback(docking::door::Request &req, docking::door::Response &res)
   client1->call(door_Input);
   double begin =ros::Time::now().toSec();
   
-   while(1)
+   while(ros::ok())
    {
         double done =ros::Time::now().toSec();
    	if(done-begin > 5.0)
    	{
    	  door_Input.request.id = 12;
-      door_Input.request.addr_name = "Goal_Velocity";
-      door_Input.request.value = 0; 
+          door_Input.request.addr_name = "Goal_Velocity";
+          door_Input.request.value = 0; 
    	  client1->call(door_Input);
    	  res.door_done = 1;
    	  

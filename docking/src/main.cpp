@@ -4,10 +4,13 @@
 #include "docking/door.h"
 #include "docking/docking.h"
 #include "docking/desired_position.h"
+#include "robot_msgs/omoapproach.h"
+#include "robot_msgs/omoalign.h"
 
 ros::ServiceClient * client_Door;
 ros::ServiceClient * client_Init;
-/*ros::ServiceClient * client_;*/
+ros::ServiceClient * client_App;
+ros::ServiceClient * client_Align;
 ros::ServiceClient * client_Ppp;
 ros::ServiceClient * client_Xyz;
 
@@ -16,7 +19,9 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    
    docking::door door;
    docking::Init Init;
-   //
+   robot_msgs::omoalign omoalign;
+   robot_msgs::omoapproach omoapproach;
+   omoapproach.request.z_goal = 0.25; 
    docking::ppp  ppp;
    docking::desired_position xyz;
    xyz.request.x=0;
@@ -31,22 +36,37 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
      Init.request.Init_start =1;
      client_Init ->call(Init);
      
-     //
+     client_Align ->call(omoalign);
      
-     
-    // ppp.request.ppp_start == 1;
-    // client_Init ->call(ppp);
-     
-     
-     //wait a seconds
-     
-   //  client_Xyz ->call(xyz);
-     
-     if(Init.response.Init_done ==1)
+     while(ros::ok())
      {
-      door.request.door_start = 0;
-      client_Door ->call(door);
+       if(omoalign.response.is_aligned ==1) break;
      }
+     client_App ->call(omoapproach);
+      
+     
+     ppp.request.ppp_start == 1;
+     client_Init ->call(ppp);
+     ROS_INFO("ha!");
+     
+     double begin =ros::Time::now().toSec();
+  
+     while(ros::ok())
+     {
+        double done =ros::Time::now().toSec();
+        ROS_INFO("charging,,, ");
+   	if(done-begin > 5.0)
+   	{
+   	  
+   	  client_Xyz ->call(xyz);
+   	} 
+   	break;
+     }
+   
+     
+    ROS_INFO("done");
+     
+    
      res.done = 1;
       
    }
@@ -72,8 +92,11 @@ int main(int argc, char **argv)
   ros::ServiceClient client_init = nh.serviceClient<docking::Init>("Init");
   client_Init = &client_init;
   
-  /*ros::ServiceClient client_tmp2 = nh.serviceClient<docking::ppp>("ppp");
-  client2 = &client_tmp2; */
+  ros::ServiceClient client_align = nh.serviceClient<robot_msgs::omoalign>("omo_con_srv");
+  client_Align = &client_align;
+  
+  ros::ServiceClient client_app = nh.serviceClient<robot_msgs::omoapproach>("omo_approach");
+  client_App = &client_app;
   
   ros::ServiceClient client_ppp = nh.serviceClient<docking::ppp>("ppp");
   client_Ppp = &client_ppp;
