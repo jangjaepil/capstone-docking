@@ -32,7 +32,20 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    {
      door.request.door_start = 1;
      client_Door ->call(door);
-    
+     
+     double begin =ros::Time::now().toSec();
+  
+     while(ros::ok())
+     {
+        double done =ros::Time::now().toSec();
+       
+   	if(done-begin > 3.0)
+   	{
+   	  
+   	  break;
+   	} 
+   	
+     }
     
      
     /* client_Align ->call(omoalign);
@@ -57,9 +70,10 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    	if(done-begin > 15.0)
    	{
    	  
-   	  client_Xyz ->call(xyz);
+   	  
+        break;
    	} 
-   	break;
+   	
      }
       
      Init.request.Init_start =1;
