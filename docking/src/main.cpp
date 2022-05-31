@@ -26,27 +26,26 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
    docking::desired_position xyz;
    xyz.request.x=0;
    xyz.request.y=0;
-   xyz.request.z=0;
+   xyz.request.z=5;
    
    if(req.docking_start == 1)
    {
      door.request.door_start = 1;
      client_Door ->call(door);
     
-     Init.request.Init_start =1;
-     client_Init ->call(Init);
+    
      
-     client_Align ->call(omoalign);
+    /* client_Align ->call(omoalign);
      
      while(ros::ok())
      {
        if(omoalign.response.is_aligned ==1) break;
-     }
+     }*/
      client_App ->call(omoapproach);
       
      
      ppp.request.ppp_start == 1;
-     client_Init ->call(ppp);
+     client_Ppp ->call(ppp);
      ROS_INFO("ha!");
      
      double begin =ros::Time::now().toSec();
@@ -55,13 +54,16 @@ bool docking_callback(docking::docking::Request &req, docking::docking::Response
      {
         double done =ros::Time::now().toSec();
         ROS_INFO("charging,,, ");
-   	if(done-begin > 5.0)
+   	if(done-begin > 15.0)
    	{
    	  
    	  client_Xyz ->call(xyz);
    	} 
    	break;
      }
+      
+     Init.request.Init_start =1;
+     client_Init ->call(Init); 
    
      
     ROS_INFO("done");
